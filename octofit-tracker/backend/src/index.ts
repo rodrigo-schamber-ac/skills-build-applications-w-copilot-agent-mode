@@ -1,7 +1,7 @@
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
-import mongoose from 'mongoose';
+import { connectDatabase, isDatabaseConnected, mongoUri } from './database';
 import activitiesRouter from './routes/activities';
 import leaderboardRouter from './routes/leaderboard';
 import teamsRouter from './routes/teams';
@@ -12,7 +12,6 @@ dotenv.config();
 
 const app = express();
 const port = Number(process.env.PORT ?? 8000);
-const mongoUri = process.env.MONGO_URI ?? 'mongodb://127.0.0.1:27017/octofit_db';
 
 const codespaceName = process.env.CODESPACE_NAME;
 const baseUrl = codespaceName
@@ -36,7 +35,7 @@ app.get('/api/health', (_req, res) => {
     baseUrl,
     mongo: {
       target: mongoUri,
-      connected: mongoose.connection.readyState === 1,
+      connected: isDatabaseConnected(),
     },
   });
 });
@@ -50,7 +49,7 @@ app.use((error: unknown, _req: express.Request, res: express.Response, _next: ex
 
 const start = async (): Promise<void> => {
   try {
-    await mongoose.connect(mongoUri);
+    await connectDatabase();
     console.log(`MongoDB connected: ${mongoUri}`);
   } catch (error) {
     console.error('MongoDB connection failed:', error);

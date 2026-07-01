@@ -3,17 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
+const database_1 = require("../database");
 const Activity_1 = __importDefault(require("../models/Activity"));
 const Leaderboard_1 = __importDefault(require("../models/Leaderboard"));
 const Team_1 = __importDefault(require("../models/Team"));
 const User_1 = __importDefault(require("../models/User"));
 const Workout_1 = __importDefault(require("../models/Workout"));
-const mongoUri = process.env.MONGO_URI ?? 'mongodb://127.0.0.1:27017/octofit_db';
 const seed = async () => {
     // Seed the octofit_db database with test data
     console.log('Seed the octofit_db database with test data');
-    await mongoose_1.default.connect(mongoUri);
+    await (0, database_1.connectDatabase)();
     await Promise.all([
         Team_1.default.deleteMany({}),
         User_1.default.deleteMany({}),
@@ -150,5 +149,5 @@ void seed()
     process.exitCode = 1;
 })
     .finally(async () => {
-    await mongoose_1.default.connection.close();
+    await (0, database_1.disconnectDatabase)();
 });
